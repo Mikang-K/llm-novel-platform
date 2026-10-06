@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
 app = FastAPI()
@@ -19,10 +19,28 @@ class NovelCreate(BaseModel):
 def get_status():
     return {"status": "ok"}
 
+novels = {}
+next_id = 1
+
 @app.post("/novels")
 def create_novel(data: NovelCreate):
-    return {
-        "id": 1, 
-        "title": data.title, 
-        "description": data.description
-        }
+    global next_id
+
+    novel_id = next_id
+    novels[novel_id] = {
+        "id":novel_id,
+        "title":data.title, 
+        "description":data.description
+    }
+    next_id += 1
+
+    return novels[novel_id]
+
+@app.get("/novels/{novel_id}")
+def get_novel(novel_id: int):
+    if novel_id not in novels:
+        raise HTTPException(
+            status_code=404,
+            detail="Novel not Found"
+        )
+    return novels[novel_id]
