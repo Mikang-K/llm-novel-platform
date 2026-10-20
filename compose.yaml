@@ -10,12 +10,12 @@ services:
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
-      - postgres_data: /var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL","pg_isready -U novel -d novel_db"]
       interval: 5s
       timeout: 3s
-      retires: 5
+      retries: 5
 
 volumes:
   postgres_data:
